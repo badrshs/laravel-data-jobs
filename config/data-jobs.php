@@ -18,7 +18,7 @@ return [
     'log_table' => 'data_jobs_log',
 
     /**
-     * Enable or disable job execution logging.
+     * Enable or disable job execution logging. 
      * When disabled, jobs will run without database tracking.
      */
     'logging_enabled' => true,
