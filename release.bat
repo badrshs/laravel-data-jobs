@@ -6,7 +6,7 @@ echo    Dynamic Image Composer Release
 echo ========================================
 echo.
 
-REM Get the last tag
+REM Get the last tag 
 echo Fetching latest tag...
 git describe --tags --abbrev=0 > temp_tag.txt 2>&1
 set /p LAST_TAG=<temp_tag.txt
