@@ -24,7 +24,7 @@ class RunDataJobsCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Run all data jobs that implement the DataJob interface';
+    protected $description = 'Run all data jobs that use the DataJob trait';
 
     /**
      * Execute the console command.
@@ -116,7 +116,7 @@ class RunDataJobsCommand extends Command
     }
 
     /**
-     * Discover all commands that implement DataJob interface.
+     * Discover all commands that use the DataJob trait.
      *
      * @return array
      */
@@ -130,10 +130,7 @@ class RunDataJobsCommand extends Command
                 continue;
             }
 
-            $reflection = new ReflectionClass($command);
-
-            if ($reflection->implementsInterface(DataJob::class)) {
-                /** @var Command&DataJob $command */
+            if ($this->usesDataJobTrait($command)) {
                 $jobs[] = [
                     'class' => get_class($command),
                     'name' => class_basename($command),
@@ -145,6 +142,18 @@ class RunDataJobsCommand extends Command
         }
 
         return $jobs;
+    }
+
+    /**
+     * Check if a command uses the DataJob trait.
+     *
+     * @param Command $command
+     * @return bool
+     */
+    protected function usesDataJobTrait(Command $command): bool
+    {
+        $traits = class_uses_recursive($command);
+        return in_array(DataJob::class, $traits);
     }
 
     /**

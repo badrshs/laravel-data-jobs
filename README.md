@@ -67,7 +67,7 @@ php artisan migrate
 php artisan make:command MigrateUserData
 ```
 
-2. Implement the `DataJob` interface and use the `HasDataJobDefaults` trait:
+2. Add the `DataJob` trait to your command:
 
 ```php
 <?php
@@ -76,12 +76,11 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Badrshs\LaravelDataJobs\Contracts\DataJob;
-use Badrshs\LaravelDataJobs\Traits\HasDataJobDefaults;
 use Illuminate\Support\Facades\DB;
 
-class MigrateUserData extends Command implements DataJob
+class MigrateUserData extends Command
 {
-    use HasDataJobDefaults;
+    use DataJob;
 
     protected $signature = 'data:migrate-user-data';
     protected $description = 'Migrate user data from old format to new format';
@@ -105,16 +104,16 @@ class MigrateUserData extends Command implements DataJob
 }
 ```
 
-**That's it!** The trait provides default implementations for `getJobParameters()` and `getJobPriority()`.
+**That's it!** Just add `use DataJob;` to your command class.
 
 ### Customizing Job Behavior (Optional)
 
 Override these methods only if you need custom behavior:
 
 ```php
-class MigrateUserData extends Command implements DataJob
+class MigrateUserData extends Command
 {
-    use HasDataJobDefaults;
+    use DataJob;
 
     protected $signature = 'data:migrate-user-data';
     protected $description = 'Migrate user data from old format to new format';
