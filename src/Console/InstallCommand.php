@@ -22,6 +22,13 @@ class InstallCommand extends Command
             '--force' => $this->option('force'),
         ]);
 
+        // Publish migrations (important for standalone installations)
+        $this->comment('Publishing migrations...');
+        $this->callSilent('vendor:publish', [
+            '--tag' => 'data-jobs-migrations',
+            '--force' => $this->option('force'),
+        ]);
+
         // Run migrations
         $this->comment('Running migrations...');
         $this->call('migrate');
@@ -34,8 +41,8 @@ class InstallCommand extends Command
         // Show next steps
         $this->comment('Next steps:');
         $this->line('1. Create a data job: php artisan make:command YourDataJob');
-        $this->line('2. Add this line to your command: use DataJob;');
-        $this->line('3. Run data jobs: php artisan data-jobs:run');
+        $this->line('2. Add this line to your command: use DataJobable;');
+        $this->line('3. Run data jobs: php artisan data:run-jobs');
         $this->newLine();
         $this->line('Documentation: https://github.com/badrshs/laravel-data-jobs');
 

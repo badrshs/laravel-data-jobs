@@ -13,17 +13,13 @@ return [
 
     /**
      * The database table name for storing job execution logs.
+     * You can customize this if you need a different table name.
      */
     'log_table' => 'data_jobs_log',
 
     /**
-     * Automatically run pending jobs on application boot.
-     * Set to true for automatic execution, false for manual execution.
-     */
-    'auto_run' => false,
-
-    /**
      * Enable or disable job execution logging.
+     * When disabled, jobs will run without database tracking.
      */
     'logging_enabled' => true,
 ];

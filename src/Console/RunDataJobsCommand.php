@@ -33,7 +33,7 @@ class RunDataJobsCommand extends Command
     {
         if ($this->option('fresh')) {
             if ($this->confirm('⚠️  This will clear all job execution logs. Continue?', false)) {
-                DB::table('data_jobs_log')->truncate();
+                DB::table(config('data-jobs.log_table', 'data_jobs_log'))->truncate();
                 $this->info('✅ Job logs cleared');
             } else {
                 return self::SUCCESS;
@@ -164,7 +164,7 @@ class RunDataJobsCommand extends Command
      */
     protected function getJobStatus(string $jobClass): string
     {
-        $log = DB::table('data_jobs_log')
+        $log = DB::table(config('data-jobs.log_table', 'data_jobs_log'))
             ->where('job_class', $jobClass)
             ->first();
 
@@ -182,18 +182,23 @@ class RunDataJobsCommand extends Command
         $jobClass = $job['class'];
         $startTime = now();
 
-        // Create or update log entry
-        DB::table('data_jobs_log')->updateOrInsert(
-            ['job_class' => $jobClass],
-            [
-                'priority' => $job['priority'],
-                'parameters' => json_encode($job['parameters']),
-                'status' => 'running',
-                'started_at' => $startTime,
-                'error_message' => null,
-                'updated_at' => $startTime,
-            ]
-        );
+        // Skip logging if disabled
+        if (!config('data-jobs.logging_enabled', true)) {
+            $this->info('⚠️  Logging disabled - running without database tracking');
+        } else {
+            // Create or update log entry
+            DB::table(config('data-jobs.log_table', 'data_jobs_log'))->updateOrInsert(
+                ['job_class' => $jobClass],
+                [
+                    'priority' => $job['priority'],
+                    'parameters' => json_encode($job['parameters']),
+                    'status' => 'running',
+                    'started_at' => $startTime,
+                    'error_message' => null,
+                    'updated_at' => $startTime,
+                ]
+            );
+        }
 
         try {
             /** @var Command $command */
@@ -219,37 +224,43 @@ class RunDataJobsCommand extends Command
             );
 
             if ($exitCode === Command::SUCCESS) {
-                DB::table('data_jobs_log')
-                    ->where('job_class', $jobClass)
-                    ->update([
-                        'status' => 'completed',
-                        'completed_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+                if (config('data-jobs.logging_enabled', true)) {
+                    DB::table(config('data-jobs.log_table', 'data_jobs_log'))
+                        ->where('job_class', $jobClass)
+                        ->update([
+                            'status' => 'completed',
+                            'completed_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                }
 
                 return true;
             } else {
                 $errorMessage = "Command exited with code: {$exitCode}";
-                DB::table('data_jobs_log')
-                    ->where('job_class', $jobClass)
-                    ->update([
-                        'status' => 'failed',
-                        'error_message' => $errorMessage,
-                        'updated_at' => now(),
-                    ]);
+                if (config('data-jobs.logging_enabled', true)) {
+                    DB::table(config('data-jobs.log_table', 'data_jobs_log'))
+                        ->where('job_class', $jobClass)
+                        ->update([
+                            'status' => 'failed',
+                            'error_message' => $errorMessage,
+                            'updated_at' => now(),
+                        ]);
+                }
 
                 return $errorMessage;
             }
         } catch (\Throwable $e) {
             $errorMessage = $e->getMessage();
 
-            DB::table('data_jobs_log')
-                ->where('job_class', $jobClass)
-                ->update([
-                    'status' => 'failed',
-                    'error_message' => $errorMessage,
-                    'updated_at' => now(),
-                ]);
+            if (config('data-jobs.logging_enabled', true)) {
+                DB::table(config('data-jobs.log_table', 'data_jobs_log'))
+                    ->where('job_class', $jobClass)
+                    ->update([
+                        'status' => 'failed',
+                        'error_message' => $errorMessage,
+                        'updated_at' => now(),
+                    ]);
+            }
 
             return $errorMessage;
         }

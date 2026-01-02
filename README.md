@@ -106,7 +106,7 @@ Execute all pending jobs:
 php artisan data:run-jobs
 ```
 
-The package will automatically discover and execute all commands using the `DataJob` trait, sorted by priority.
+The package will automatically discover and execute all commands using the `DataJobable` trait, sorted by priority.
 
 ### Advanced Usage
 
@@ -148,10 +148,10 @@ return [
     // Database table name for job logs
     'log_table' => 'data_jobs_log',
     
-    // Enable/disable execution logging
+    // Enable/disable execution logging (jobs run without DB tracking when false)
     'logging_enabled' => true,
     
-    // Auto-run pending jobs (future feature)
+    // Auto-run pending jobs (not yet implemented)
     'auto_run' => false,
 ];
 ```
