@@ -18,18 +18,32 @@ A Laravel package for managing and executing data migration jobs with tracking, 
 
 ## Installation
 
+### Quick Install (Recommended)
+
+```bash
+composer require badrshs/laravel-data-jobs
+php artisan data-jobs:install
+```
+
+That's it! The install command will:
+- ✓ Publish the configuration file
+- ✓ Run database migrations
+- ✓ Show you next steps
+
+### Manual Installation
+
+If you prefer manual setup:
+
 ### 1. Install via Composer
 
 ```bash
 composer require badrshs/laravel-data-jobs
 ```
 
-### 2. Publish Migrations (Optional)
-
-The package will automatically load migrations, but if you need to customize them:
+### 2. Publish Config (Optional)
 
 ```bash
-php artisan vendor:publish --tag=data-jobs-migrations
+php artisan vendor:publish --tag=data-jobs-config
 ```
 
 ### 3. Run Migrations
@@ -38,11 +52,10 @@ php artisan vendor:publish --tag=data-jobs-migrations
 php artisan migrate
 ```
 
-### 4. Publish Config (Optional)
+## Requirements
 
-```bash
-php artisan vendor:publish --tag=data-jobs-config
-```
+- PHP 8.0, 8.1, 8.2, or 8.3
+- Laravel 9.x, 10.x, 11.x, or 12.x
 
 ## Usage
 

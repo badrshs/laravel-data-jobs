@@ -4,6 +4,7 @@ namespace Badrshs\LaravelDataJobs;
 
 use Illuminate\Support\ServiceProvider;
 use Badrshs\LaravelDataJobs\Console\RunDataJobsCommand;
+use Badrshs\LaravelDataJobs\Console\InstallCommand;
 
 class DataJobsServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,7 @@ class DataJobsServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 RunDataJobsCommand::class,
+                InstallCommand::class,
             ]);
 
             // Publish migrations
