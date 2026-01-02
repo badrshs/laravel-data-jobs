@@ -52,7 +52,7 @@ This will:
 Create a new Artisan command:
 
 ```bash
-php artisan make:command MigrateUsersCommand
+php artisan make:command MigrateUsersCommandExample
 ```
 
 ### 2. Add the DataJob Trait
@@ -67,21 +67,23 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Badrshs\LaravelDataJobs\Contracts\DataJob;
 
-class MigrateUsersCommand extends Command
+class MigrateUsersCommandExample extends Command
 {
     use DataJob;
 
-    protected $signature = 'migrate:users';
+    protected $signature = 'data:migrate-users';
     protected $description = 'Migrate users to new structure';
 
+    // Optional: Set job priority (lower numbers run first, default: 100)
     public function getJobPriority(): int
     {
-        return 10; // Lower numbers run first (default: 100)
+        return 10;
     }
 
+    // Optional: Define job metadata/parameters
     public function getJobParameters(): array
     {
-        return ['batch' => 'user-migration']; // Optional metadata
+        return ['batch' => 'user-migration'];
     }
 
     public function handle(): int
@@ -110,7 +112,7 @@ The package will automatically discover and execute all commands using the `Data
 
 **Run a specific job:**
 ```bash
-php artisan data:run-jobs --job=MigrateUsersCommand
+php artisan data:run-jobs --job=MigrateUsersCommandExample
 ```
 
 **Force re-run completed jobs:**
@@ -161,17 +163,17 @@ When running jobs, you'll see clear progress feedback:
 ```
 🚀 Starting data jobs execution...
 
-┌──────────┬─────────────────────┬───────────┐
-│ Priority │ Job Class           │ Status    │
-├──────────┼─────────────────────┼───────────┤
-│ 10       │ MigrateUsersCommand │ pending   │
-│ 20       │ UpdateStatsCommand  │ completed │
-└──────────┴─────────────────────┴───────────┘
+┌──────────┬──────────────────────────────┬───────────┐
+│ Priority │ Job Class                    │ Status    │
+├──────────┼──────────────────────────────┼───────────┤
+│ 10       │ MigrateUsersCommandExample   │ pending   │
+│ 20       │ UpdateStatsCommandExample    │ completed │
+└──────────┴──────────────────────────────┴───────────┘
 
-▶️  Running: MigrateUsersCommand
-✅ Completed: MigrateUsersCommand
+▶️  Running: MigrateUsersCommandExample
+✅ Completed: MigrateUsersCommandExample
 
-⏭️  Skipping UpdateStatsCommand (already completed)
+⏭️  Skipping UpdateStatsCommandExample (already completed)
 
 📊 Execution Summary:
    - Executed: 1
