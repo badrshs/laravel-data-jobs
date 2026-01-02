@@ -4,70 +4,60 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/badrshs/laravel-data-jobs.svg?style=flat-square)](https://packagist.org/packages/badrshs/laravel-data-jobs)
 [![License](https://img.shields.io/packagist/l/badrshs/laravel-data-jobs.svg?style=flat-square)](https://packagist.org/packages/badrshs/laravel-data-jobs)
 
-A Laravel package for managing and executing data migration jobs with tracking, priority support, and execution logging.
+A Laravel package for managing and executing one-time data migration jobs with priority support, execution tracking, and automatic discovery.
 
-## Features
+## The Problem
 
-- 🚀 Simple interface for creating data migration jobs
-- 📊 Automatic job discovery and execution
-- 🎯 Priority-based job ordering
-- 📝 Complete execution logging and tracking
-- 🔄 Skip already completed jobs
-- ⚠️ Error handling and reporting
-- 🎨 Beautiful CLI output with progress tracking
+When working on Laravel applications, you often need to run one-time data migrations or transformations—tasks that don't fit into regular database migrations but still need to be executed in a controlled, trackable way. These might include:
+
+- Migrating data between tables after a schema change
+- Backfilling data for new features
+- Transforming existing data to match new requirements
+- Seeding production data based on business logic
+
+Managing these tasks manually is error-prone and makes it difficult to track what has been executed across different environments.
+
+## The Solution
+
+**Laravel Data Jobs** provides a simple, elegant solution by turning Artisan commands into trackable, priority-based data jobs. Simply add a trait to your command, and the package handles:
+
+- ✅ **Automatic Discovery** - No manual registration required
+- ✅ **Execution Tracking** - Prevents duplicate runs and logs all activity
+- ✅ **Priority Support** - Control the order of job execution
+- ✅ **Status Management** - Track pending, running, completed, and failed jobs
+- ✅ **Error Handling** - Graceful failure handling with detailed error logging
 
 ## Installation
 
-### Quick Install (Recommended)
+Install the package via Composer:
 
 ```bash
 composer require badrshs/laravel-data-jobs
+```
+
+Run the installation command:
+
+```bash
 php artisan data-jobs:install
 ```
 
-That's it! The install command will:
-- ✓ Publish the configuration file
-- ✓ Run database migrations
-- ✓ Show you next steps
-
-### Manual Installation
-
-If you prefer manual setup:
-
-### 1. Install via Composer
-
-```bash
-composer require badrshs/laravel-data-jobs
-```
-
-### 2. Publish Config (Optional)
-
-```bash
-php artisan vendor:publish --tag=data-jobs-config
-```
-
-### 3. Run Migrations
-
-```bash
-php artisan migrate
-```
-
-## Requirements
-
-- PHP 8.0, 8.1, 8.2, or 8.3
-- Laravel 9.x, 10.x, 11.x, or 12.x
+This will:
+- Publish the configuration file to `config/data-jobs.php`
+- Run the migration to create the `data_jobs_log` table
 
 ## Usage
 
-### Creating a Data Job
+### 1. Create a Data Job Command
 
-1. Create a new Artisan command:
+Create a new Artisan command:
 
 ```bash
-php artisan make:command MigrateUserData
+php artisan make:command MigrateUsersCommand
 ```
 
-2. Add the `DataJob` trait to your command:
+### 2. Add the DataJob Trait
+
+Add the `DataJob` trait to your command and optionally customize priority:
 
 ```php
 <?php
@@ -76,147 +66,97 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Badrshs\LaravelDataJobs\Contracts\DataJob;
-use Illuminate\Support\Facades\DB;
 
-class MigrateUserData extends Command
+class MigrateUsersCommand extends Command
 {
     use DataJob;
 
-    protected $signature = 'data:migrate-user-data';
-    protected $description = 'Migrate user data from old format to new format';
+    protected $signature = 'migrate:users';
+    protected $description = 'Migrate users to new structure';
 
-    public function handle(): int
-    {
-        $this->info('Starting user data migration...');
-        
-        // Your migration logic here
-        DB::table('users')
-            ->whereNull('migrated_at')
-            ->update([
-                'migrated_at' => now(),
-                // ... other updates
-            ]);
-
-        $this->info('Migration completed!');
-        
-        return self::SUCCESS;
-    }
-}
-```
-
-**That's it!** Just add `use DataJob;` to your command class.
-
-### Customizing Job Behavior (Optional)
-
-Override these methods only if you need custom behavior:
-
-```php
-class MigrateUserData extends Command
-{
-    use DataJob;
-
-    protected $signature = 'data:migrate-user-data';
-    protected $description = 'Migrate user data from old format to new format';
-
-    public function handle(): int
-    {
-        // Your migration logic
-        return self::SUCCESS;
-    }
-
-    /**
-     * Optional: Define job parameters (metadata)
-     */
-    public function getJobParameters(): array
-    {
-        return [
-            'table' => 'users',
-            'type' => 'data-migration',
-        ];
-    }
-
-    /**
-     * Optional: Set job priority (lower numbers run first, default is 100)
-     */
     public function getJobPriority(): int
     {
-        return 10; // High priority
+        return 10; // Lower numbers run first (default: 100)
     }
+
+    public function getJobParameters(): array
+    {
+        return ['batch' => 'user-migration']; // Optional metadata
+    }
+
+    public function handle(): int
+    {
+        $this->info('Migrating users...');
+        
+        // Your migration logic here
+        
+        $this->info('Migration complete!');
+        return self::SUCCESS;
     }
 }
 ```
 
-### Running Data Jobs
+### 3. Run Your Data Jobs
 
-Execute all pending data jobs:
+Execute all pending jobs:
 
 ```bash
 php artisan data:run-jobs
 ```
 
-### Command Options
+The package will automatically discover and execute all commands using the `DataJob` trait, sorted by priority.
+
+### Advanced Usage
+
+**Run a specific job:**
+```bash
+php artisan data:run-jobs --job=MigrateUsersCommand
+```
 
 **Force re-run completed jobs:**
 ```bash
 php artisan data:run-jobs --force
 ```
 
-**Run a specific job:**
-```bash
-php artisan data:run-jobs --job="App\Console\Commands\MigrateUserData"
-```
-
-**Clear logs and start fresh:**
+**Clear all logs and run fresh:**
 ```bash
 php artisan data:run-jobs --fresh
 ```
 
 ## How It Works
 
-1. **Discovery**: The package automatically discovers all Artisan commands that implement the `DataJob` interface
-2. **Prioritization**: Jobs are sorted by priority (lower numbers first)
-3. **Execution**: Each job is executed in order
-4. **Logging**: Execution status, errors, and timestamps are logged to the `data_jobs_log` table
-5. **Skip Completed**: Already completed jobs are skipped unless `--force` is used
+1. **Discovery**: The package scans all registered Artisan commands for those using the `DataJob` trait
+2. **Priority Sorting**: Jobs are sorted by priority (lower numbers execute first)
+3. **Status Tracking**: Each job's status is logged in the `data_jobs_log` table
+4. **Execution**: Jobs run sequentially, with full error handling and logging
+5. **Completion**: Successfully completed jobs won't run again unless forced
 
-## Job Lifecycle
+## Configuration
 
-```
-┌─────────────┐
-│   Pending   │ ─┐
-└─────────────┘  │
-                 ▼
-┌─────────────┐
-│   Running   │
-└─────────────┘
-       │
-       ├─── Success ──────▶ ┌─────────────┐
-       │                    │  Completed  │
-       │                    └─────────────┘
-       │
-       └─── Failure ──────▶ ┌─────────────┐
-                            │   Failed    │
-                            └─────────────┘
+Publish and customize the configuration file:
+
+```bash
+php artisan vendor:publish --tag=data-jobs-config
 ```
 
-## Database Schema
+Available options in `config/data-jobs.php`:
 
-The package creates a `data_jobs_log` table with the following structure:
-
-| Column        | Type      | Description                           |
-|--------------|-----------|---------------------------------------|
-| id           | bigint    | Primary key                          |
-| job_class    | string    | Fully qualified job class name       |
-| priority     | integer   | Job execution priority               |
-| parameters   | json      | Job metadata/parameters              |
-| status       | enum      | pending, running, completed, failed  |
-| error_message| text      | Error message if failed              |
-| started_at   | timestamp | When job execution started           |
-| completed_at | timestamp | When job completed successfully      |
-| created_at   | timestamp | Record creation time                 |
-| updated_at   | timestamp | Record update time                   |
+```php
+return [
+    // Database table name for job logs
+    'log_table' => 'data_jobs_log',
+    
+    // Enable/disable execution logging
+    'logging_enabled' => true,
+    
+    // Auto-run pending jobs (future feature)
+    'auto_run' => false,
+];
+```
 
 ## Example Output
+
+When running jobs, you'll see clear progress feedback:
 
 ```
 🚀 Starting data jobs execution...
@@ -224,63 +164,52 @@ The package creates a `data_jobs_log` table with the following structure:
 ┌──────────┬─────────────────────┬───────────┐
 │ Priority │ Job Class           │ Status    │
 ├──────────┼─────────────────────┼───────────┤
-│ 10       │ MigrateUserData     │ pending   │
-│ 20       │ MigratePaymentData  │ completed │
-│ 30       │ UpdateCampaignStats │ pending   │
+│ 10       │ MigrateUsersCommand │ pending   │
+│ 20       │ UpdateStatsCommand  │ completed │
 └──────────┴─────────────────────┴───────────┘
 
-▶️  Running: MigrateUserData
-Starting user data migration...
-Migration completed!
-✅ Completed: MigrateUserData
+▶️  Running: MigrateUsersCommand
+✅ Completed: MigrateUsersCommand
 
-⏭️  Skipping MigratePaymentData (already completed)
-
-▶️  Running: UpdateCampaignStats
-Updating campaign statistics...
-✅ Completed: UpdateCampaignStats
+⏭️  Skipping UpdateStatsCommand (already completed)
 
 📊 Execution Summary:
-   - Executed: 2
+   - Executed: 1
    - Skipped: 1
    - Failed: 0
 ```
 
-## Configuration
-
-Edit `config/data-jobs.php` to customize behavior:
-
-```php
-return [
-    // Database table for storing job logs
-    'log_table' => 'data_jobs_log',
-    
-    // Auto-run pending jobs on boot (default: false)
-    'auto_run' => false,
-    
-    // Enable execution logging (default: true)
-    'logging_enabled' => true,
-];
-```
-
-## Best Practices
-
-1. **Keep jobs idempotent**: Jobs should be safe to run multiple times
-2. **Use transactions**: Wrap database operations in transactions
-3. **Set appropriate priorities**: Critical migrations should have lower priority numbers
-4. **Add descriptive output**: Use Laravel's console output methods for clear feedback
-5. **Handle errors gracefully**: Return proper exit codes and log errors
-6. **Test thoroughly**: Test jobs with `--force` flag before production deployment
-
 ## Requirements
 
-- PHP 8.2 or higher
-- Laravel 11.0 or higher
-- MySQL/PostgreSQL/SQLite database
+- PHP 8.0 or higher
+- Laravel 9.0, 10.0, 11.0, or 12.0
+
+## Testing
+
+Run the test suite:
+
+```bash
+vendor/bin/phpunit
+```
+
+Or using Composer:
+
+```bash
+composer test
+```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+## Security
+
+If you discover any security-related issues, please email badr@badrshs.com instead of using the issue tracker.
+
+## Credits
+
+- [Badr](https://github.com/badrshs)
+- [All Contributors](../../contributors)
 
 ## License
 
@@ -288,9 +217,5 @@ The MIT License (MIT). Please see [License File](LICENSE) for more information.
 
 ## Support
 
-If you discover any security vulnerabilities or issues, please open an issue on [GitHub](https://github.com/badrshs/laravel-data-jobs/issues).
-
-## Credits
-
-- [Badr](https://github.com/badrshs)
-- [All Contributors](https://github.com/badrshs/laravel-data-jobs/contributors)
+- **Issues**: [GitHub Issues](https://github.com/badrshs/laravel-data-jobs/issues)
+- **Documentation**: [GitHub Repository](https://github.com/badrshs/laravel-data-jobs)
