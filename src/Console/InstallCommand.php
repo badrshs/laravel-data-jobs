@@ -34,8 +34,9 @@ class InstallCommand extends Command
         // Show next steps
         $this->comment('Next steps:');
         $this->line('1. Create a data job: php artisan make:command YourDataJob');
-        $this->line('2. Implement DataJob interface in your command');
-        $this->line('3. Run data jobs: php artisan data-jobs:run');
+        $this->line('2. Add: implements DataJob');
+        $this->line('3. Add: use HasDataJobDefaults;');
+        $this->line('4. Run data jobs: php artisan data-jobs:run');
         $this->newLine();
         $this->line('Documentation: https://github.com/badrshs/laravel-data-jobs');
 

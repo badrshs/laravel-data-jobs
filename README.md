@@ -67,7 +67,7 @@ php artisan migrate
 php artisan make:command MigrateUserData
 ```
 
-2. Implement the `DataJob` interface:
+2. Implement the `DataJob` interface and use the `HasDataJobDefaults` trait:
 
 ```php
 <?php
@@ -76,10 +76,13 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Badrshs\LaravelDataJobs\Contracts\DataJob;
+use Badrshs\LaravelDataJobs\Traits\HasDataJobDefaults;
 use Illuminate\Support\Facades\DB;
 
 class MigrateUserData extends Command implements DataJob
 {
+    use HasDataJobDefaults;
+
     protected $signature = 'data:migrate-user-data';
     protected $description = 'Migrate user data from old format to new format';
 
@@ -99,9 +102,31 @@ class MigrateUserData extends Command implements DataJob
         
         return self::SUCCESS;
     }
+}
+```
+
+**That's it!** The trait provides default implementations for `getJobParameters()` and `getJobPriority()`.
+
+### Customizing Job Behavior (Optional)
+
+Override these methods only if you need custom behavior:
+
+```php
+class MigrateUserData extends Command implements DataJob
+{
+    use HasDataJobDefaults;
+
+    protected $signature = 'data:migrate-user-data';
+    protected $description = 'Migrate user data from old format to new format';
+
+    public function handle(): int
+    {
+        // Your migration logic
+        return self::SUCCESS;
+    }
 
     /**
-     * Define job parameters (optional metadata)
+     * Optional: Define job parameters (metadata)
      */
     public function getJobParameters(): array
     {
@@ -112,11 +137,12 @@ class MigrateUserData extends Command implements DataJob
     }
 
     /**
-     * Set job priority (lower numbers run first)
+     * Optional: Set job priority (lower numbers run first, default is 100)
      */
     public function getJobPriority(): int
     {
-        return 10;
+        return 10; // High priority
+    }
     }
 }
 ```
