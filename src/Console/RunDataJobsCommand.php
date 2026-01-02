@@ -199,9 +199,22 @@ class RunDataJobsCommand extends Command
             /** @var Command $command */
             $command = $job['command'];
 
-            // Execute the command
+            // Build CLI arguments from stored parameters
+            // Parameters are converted to CLI options (e.g., 'with-translations' => '--with-translations')
+            $cliArguments = [];
+            foreach ($job['parameters'] as $key => $value) {
+                if (is_bool($value)) {
+                    if ($value) {
+                        $cliArguments["--{$key}"] = true;
+                    }
+                } else {
+                    $cliArguments["--{$key}"] = $value;
+                }
+            }
+
+            // Execute the command with parameters
             $exitCode = $command->run(
-                new \Symfony\Component\Console\Input\ArrayInput([]),
+                new \Symfony\Component\Console\Input\ArrayInput($cliArguments),
                 $this->output
             );
 
