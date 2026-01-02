@@ -1,0 +1,46 @@
+{
+    "name": "badrshs/laravel-data-jobs",
+    "description": "A Laravel package for managing and executing data migration jobs with tracking and priority support",
+    "type": "library",
+    "keywords": [
+        "laravel",
+        "data-jobs",
+        "migration",
+        "data-migration",
+        "job-runner",
+        "laravel-package",
+        "database-migration"
+    ],
+    "homepage": "https://github.com/badrshs/laravel-data-jobs",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Badr",
+            "email": "badr@badrshs.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/badrshs/laravel-data-jobs/issues",
+        "source": "https://github.com/badrshs/laravel-data-jobs"
+    },
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.0|^12.0",
+        "illuminate/console": "^11.0|^12.0",
+        "illuminate/database": "^11.0|^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Badrshs\\LaravelDataJobs\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Badrshs\\LaravelDataJobs\\DataJobsServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
