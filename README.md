@@ -181,8 +181,8 @@ When running jobs, you'll see clear progress feedback:
 
 ## Requirements
 
-- PHP 8.0 or higher
-- Laravel 9.0, 10.0, 11.0, or 12.0
+- PHP 8.1 or higher
+- Laravel 10.0, 11.0, or 12.0
 
 ## Testing
 

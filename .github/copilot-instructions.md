@@ -102,8 +102,8 @@ Config published to `config/data-jobs.php` with keys:
 - `logging_enabled`: Toggle execution logging (default: true)
 
 ## Package Dependencies
-- PHP: ^8.0-8.3
-- Laravel: ^9.0-12.0 (supports wide range via illuminate/* packages)
+- PHP: ^8.1-8.3
+- Laravel: ^10.0-12.0 (supports Laravel 10, 11, and 12)
 - Dev: Orchestra Testbench for package testing, PHPUnit, Mockery
 
 ## Important Implementation Details
