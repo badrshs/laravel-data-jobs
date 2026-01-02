@@ -19,7 +19,7 @@ Managing these tasks manually is error-prone and makes it difficult to track wha
 
 ## The Solution
 
-**Laravel Data Jobs** provides a simple, elegant solution by turning Artisan commands into trackable, priority-based data jobs. Simply add a trait to your command, and the package handles:
+**Laravel Data Jobs** provides a simple, elegant solution by turning Artisan commands into trackable, priority-based data jobs. Simply add the `DataJobable` trait to your command, and the package handles:
 
 - ✅ **Automatic Discovery** - No manual registration required
 - ✅ **Execution Tracking** - Prevents duplicate runs and logs all activity
@@ -55,9 +55,9 @@ Create a new Artisan command:
 php artisan make:command MigrateUsersCommandExample
 ```
 
-### 2. Add the DataJob Trait
+### 2. Add the DataJobable Trait
 
-Add the `DataJob` trait to your command and optionally customize priority:
+Add the `DataJobable` trait to your command and optionally customize priority:
 
 ```php
 <?php
@@ -65,11 +65,11 @@ Add the `DataJob` trait to your command and optionally customize priority:
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Badrshs\LaravelDataJobs\Contracts\DataJob;
+use Badrshs\LaravelDataJobs\Contracts\DataJobable;
 
 class MigrateUsersCommandExample extends Command
 {
-    use DataJob;
+    use DataJobable;
 
     protected $signature = 'data:migrate-users';
     protected $description = 'Migrate users to new structure';
@@ -127,7 +127,7 @@ php artisan data:run-jobs --fresh
 
 ## How It Works
 
-1. **Discovery**: The package scans all registered Artisan commands for those using the `DataJob` trait
+1. **Discovery**: The package scans all registered Artisan commands for those using the `DataJobable` trait
 2. **Priority Sorting**: Jobs are sorted by priority (lower numbers execute first)
 3. **Status Tracking**: Each job's status is logged in the `data_jobs_log` table
 4. **Execution**: Jobs run sequentially, with full error handling and logging

@@ -4,7 +4,7 @@ namespace Badrshs\LaravelDataJobs\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Badrshs\LaravelDataJobs\Contracts\DataJob;
+use Badrshs\LaravelDataJobs\Contracts\DataJobable;
 use ReflectionClass;
 
 class RunDataJobsCommand extends Command
@@ -24,7 +24,7 @@ class RunDataJobsCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Run all data jobs that use the DataJob trait';
+    protected $description = 'Run all data jobs that use the DataJobable trait';
 
     /**
      * Execute the console command.
@@ -116,7 +116,7 @@ class RunDataJobsCommand extends Command
     }
 
     /**
-     * Discover all commands that use the DataJob trait.
+     * Discover all commands that use the DataJobable trait.
      *
      * @return array
      */
@@ -145,7 +145,7 @@ class RunDataJobsCommand extends Command
     }
 
     /**
-     * Check if a command uses the DataJob trait.
+     * Check if a command uses the DataJobable trait.
      *
      * @param Command $command
      * @return bool
@@ -153,7 +153,7 @@ class RunDataJobsCommand extends Command
     protected function usesDataJobTrait(Command $command): bool
     {
         $traits = class_uses_recursive($command);
-        return in_array(DataJob::class, $traits);
+        return in_array(DataJobable::class, $traits);
     }
 
     /**

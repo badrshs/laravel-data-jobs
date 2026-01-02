@@ -2,7 +2,7 @@
 
 namespace Badrshs\LaravelDataJobs\Contracts;
 
-trait DataJob
+trait DataJobable
 {
     /**
      * Get the parameters for this job.

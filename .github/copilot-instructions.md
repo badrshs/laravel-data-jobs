@@ -6,20 +6,20 @@ This is a Laravel package (`badrshs/laravel-data-jobs`) that provides a framewor
 ## Architecture & Core Concepts
 
 ### Job Discovery Pattern
-The package uses reflection-based auto-discovery via [RunDataJobsCommand.php](src/Console/RunDataJobsCommand.php#L130-L150). Any Artisan command that uses the `DataJob` trait is automatically detected by scanning `$this->getApplication()->all()` and checking `class_uses_recursive()`. No manual registration required.
+The package uses reflection-based auto-discovery via [RunDataJobsCommand.php](src/Console/RunDataJobsCommand.php#L130-L150). Any Artisan command that uses the `DataJobable` trait is automatically detected by scanning `$this->getApplication()->all()` and checking `class_uses_recursive()`. No manual registration required.
 
-### DataJob Trait Pattern
+### DataJobable Trait Pattern
 [Contracts/DataJob.php](src/Contracts/DataJob.php) provides two methods for commands:
 - `getJobPriority(): int` - Lower numbers run first (default: 100)
 - `getJobParameters(): array` - Metadata for logging (default: empty array)
 
 Example usage in a command:
 ```php
-use Badrshs\LaravelDataJobs\Contracts\DataJob;
+use Badrshs\LaravelDataJobs\Contracts\DataJobable;
 use Illuminate\Console\Command;
 
 class MigrateUsersCommand extends Command {
-    use DataJob;
+    use DataJobable;
     
     protected $signature = 'migrate:users';
     
