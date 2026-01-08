@@ -4,10 +4,11 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/badrshs/laravel-data-jobs.svg?style=flat-square)](https://packagist.org/packages/badrshs/laravel-data-jobs)
 [![License](https://img.shields.io/packagist/l/badrshs/laravel-data-jobs.svg?style=flat-square)](https://packagist.org/packages/badrshs/laravel-data-jobs)
 
-A Laravel package for managing and executing one-time data migration jobs with priority support, execution tracking, and automatic discovery.
-This library designed to help developers manage and execute one-time data migration and transformation tasks within their applications. It extends standard Laravel Artisan commands by allowing them to be defined as "data jobs" that can be tracked, prioritized, and controlled. This means you can create Artisan commands for things like migrating data after a schema change or backfilling data for new features, and the package will ensure they run in the correct order, only once (unless explicitly forced), and log their status.
+A Laravel package for running one-time data migration and transformation jobs in a controlled way.
 
-Key features include automatic discovery of these data job commands, the ability to set a priority for their execution order (lower numbers run first), and detailed logging of their status (pending, running, completed, or failed) in a database table. It provides a dedicated Artisan command, data:run-jobs, to orchestrate the execution of all discovered jobs.
+It lets you define Artisan commands as data jobs that run once by default, can be prioritized, and are fully tracked. This is useful for tasks like migrating data after schema changes or backfilling data for new features.
+
+The package automatically discovers these jobs, runs them in priority order, and records their status as pending, running, completed, or failed in the database. A single Artisan command, data:run-jobs, handles executing all registered jobs safely and in order.
 
 ## The Problem
 
