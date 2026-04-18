@@ -59,6 +59,15 @@ class RunDataJobsCommand extends Command
             }
         }
 
+        // Filter out disabled jobs
+        $jobs = array_filter($jobs, function ($job) {
+            if (!$job['command']->isEnabled()) {
+                $this->line("🚫 Disabled: {$job['name']} (skipped)");
+                return false;
+            }
+            return true;
+        });
+
         // Sort by priority (lower numbers first)
         usort($jobs, fn($a, $b) => $a['priority'] <=> $b['priority']);
 

@@ -30,6 +30,7 @@ Managing these tasks manually is error-prone and makes it difficult to track wha
 - ✅ **Priority Support** - Control the order of job execution
 - ✅ **Status Management** - Track pending, running, completed, and failed jobs
 - ✅ **Error Handling** - Graceful failure handling with detailed error logging
+- ✅ **Enable/Disable Jobs** - Disable specific jobs without removing them
 
 ## Installation
 
@@ -90,6 +91,12 @@ class MigrateUsersCommandExample extends Command
         return ['batch' => 'user-migration'];
     }
 
+    // Optional: Disable this job so it gets skipped during execution (default: true)
+    public function isEnabled(): bool
+    {
+        return false;
+    }
+
     public function handle(): int
     {
         $this->info('Migrating users...');
@@ -132,10 +139,11 @@ php artisan data:run-jobs --fresh
 ## How It Works
 
 1. **Discovery**: The package scans all registered Artisan commands for those using the `DataJobable` trait
-2. **Priority Sorting**: Jobs are sorted by priority (lower numbers execute first)
-3. **Status Tracking**: Each job's status is logged in the `data_jobs_log` table
-4. **Execution**: Jobs run sequentially, with full error handling and logging
-5. **Completion**: Successfully completed jobs won't run again unless forced
+2. **Enabled Check**: Disabled jobs (`isEnabled(): false`) are filtered out immediately with a `🚫 Disabled` message
+3. **Priority Sorting**: Remaining jobs are sorted by priority (lower numbers execute first)
+4. **Status Tracking**: Each job's status is logged in the `data_jobs_log` table
+5. **Execution**: Jobs run sequentially, with full error handling and logging
+6. **Completion**: Successfully completed jobs won't run again unless forced
 
 ## Configuration
 
@@ -174,6 +182,7 @@ When running jobs, you'll see clear progress feedback:
 │ 20       │ UpdateStatsCommandExample    │ completed │
 └──────────┴──────────────────────────────┴───────────┘
 
+🚫 Disabled: DisabledJobExample (skipped)
 ▶️  Running: MigrateUsersCommandExample
 ✅ Completed: MigrateUsersCommandExample
 

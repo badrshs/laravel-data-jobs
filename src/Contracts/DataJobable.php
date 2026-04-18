@@ -44,4 +44,21 @@ trait DataJobable
     {
         return 100;
     }
+
+    /**
+     * Determine whether this job is enabled and should be executed.
+     * Override this method and return false to disable the job.
+     * 
+     * @return bool
+     * 
+     * @example
+     * public function isEnabled(): bool
+     * {
+     *     return false; // This job will be skipped
+     * }
+     */
+    public function isEnabled(): bool
+    {
+        return true;
+    }
 }
